@@ -166,15 +166,15 @@ export default function Home() {
             <Facebook className="text-gray-500 group-hover:text-neon transition-colors" size={20} />
             <span className="text-[10px] font-bold uppercase tracking-widest group-hover:text-white">Facebook</span>
           </a>
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="https://x.com/@CetaaSecretary" className="flex items-center gap-3 group">
             <Twitter className="text-gray-500 group-hover:text-neon transition-colors" size={20} />
             <span className="text-[10px] font-bold uppercase tracking-widest group-hover:text-white">Twitter</span>
           </a>
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="https://www.linkedin.com/school/college-of-engineering-trivandrum/" className="flex items-center gap-3 group">
             <Linkedin className="text-gray-500 group-hover:text-neon transition-colors" size={20} />
             <span className="text-[10px] font-bold uppercase tracking-widest group-hover:text-white">LinkedIn</span>
           </a>
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="https://youtube.com/@cetaacet?si=DurZ4bn_z5rIct-Z" className="flex items-center gap-3 group">
             <Youtube className="text-gray-500 group-hover:text-neon transition-colors" size={20} />
             <span className="text-[10px] font-bold uppercase tracking-widest group-hover:text-white">YouTube</span>
           </a>
