@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neon: #00ff85;
+  --color-dark: #050505;
+}
+
+@layer base {
+  body {
+    @apply bg-dark text-white antialiased overflow-x-hidden;
+    cursor: none;
+  }
+}
+
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300;
+}
+
+.neon-glow {
+  text-shadow: 0 0 15px rgba(0, 255, 133, 0.6);
+}
