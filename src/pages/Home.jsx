@@ -162,7 +162,7 @@ export default function Home() {
       {/* Social Media Connectivity Section */}
       <section className="mt-24 py-10 border-y border-white/5">
         <div className="flex flex-wrap justify-center items-center gap-12">
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="https://www.facebook.com/College-of-Engineering-Trivandrum-Alumni-Association-595120010597674" className="flex items-center gap-3 group">
             <Facebook className="text-gray-500 group-hover:text-neon transition-colors" size={20} />
             <span className="text-[10px] font-bold uppercase tracking-widest group-hover:text-white">Facebook</span>
           </a>
