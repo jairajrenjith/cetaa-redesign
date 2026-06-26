@@ -8,3 +8,11 @@ export default defineConfig({
     tailwindcss(), // Add this line
   ],
 })
+
+export default defineConfig({
+  base: "/cetaa-redesign/",
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
+})
