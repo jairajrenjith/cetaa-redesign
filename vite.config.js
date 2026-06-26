@@ -9,10 +9,3 @@ export default defineConfig({
   ],
 })
 
-export default defineConfig({
-  base: "/cetaa-redesign/",
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
-})
