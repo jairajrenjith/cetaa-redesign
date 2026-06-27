@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diamond Jubilee Hall Renovation — CETAA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script>
+    (function(){
+      var t = localStorage.getItem('cetaa-theme');
+      if(t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    :root {
+      --bg:      #0b0f1a;
+      --bg2:     #111827;
+      --surface: rgba(255,255,255,0.04);
+      --border:  rgba(255,255,255,0.08);
+      --text:    #e8eaf0;
+      --muted:   rgba(232,234,240,0.50);
+      --accent:  #1a56db;
+      --gold:    #c9973a;
+      --glow:    rgba(26,86,219,0.25);
+      --radius:  1.5rem;
+      --radius-sm: 0.75rem;
+      --nav-h:   72px;
+      --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="light"] {
+      --bg:      #f5f6fa;
+      --bg2:     #eaecf4;
+      --surface: rgba(0,0,0,0.04);
+      --border:  rgba(0,0,0,0.08);
+      --text:    #0d1117;
+      --muted:   rgba(13,17,23,0.55);
+      --glow:    rgba(26,86,219,0.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.4; }
+    [data-theme="light"] #bg-canvas { opacity: 0.12; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-h); display: flex; align-items: center;
+      justify-content: space-between; padding: 0 2rem;
+      background: rgba(11,15,26,0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    [data-theme="light"] nav { background: rgba(245,246,250,0.9); }
+    .nav-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-logo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
+    .nav-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 900; }
+    .nav-title span { display: block; font-size: 0.52rem; font-family: 'Space Mono', monospace; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; }
+    .nav-links a { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.45rem 0.75rem; border-radius: var(--radius-sm); color: var(--muted); transition: color 0.2s, background 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
+    .nav-links a.active { color: var(--gold); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    #theme-toggle { width: 36px; height: 36px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
+    #theme-toggle:hover { background: var(--glow); }
+    #theme-toggle svg { width: 18px; height: 18px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-home { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.5rem 1.2rem; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--glow); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
+    @media(max-width:900px){ .nav-links{display:none;} .hamburger{display:flex;} }
+    .mobile-nav { display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 99; background: var(--bg); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; flex-direction: column; gap: 0.5rem; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { padding: 0.65rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; transition: background 0.2s, color 0.2s; }
+    .mobile-nav a:hover { background: var(--surface); color: var(--text); }
+
+    /* ─── HERO ─── */
+    main { position: relative; z-index: 1; padding-top: var(--nav-h); }
+    .reno-hero {
+      min-height: 70vh; position: relative; display: flex; align-items: flex-end;
+      overflow: hidden;
+    }
+    .reno-hero-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+    }
+    .reno-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(0deg, rgba(11,15,26,0.92) 0%, rgba(11,15,26,0.4) 55%, transparent 100%);
+    }
+    [data-theme="light"] .reno-hero-overlay {
+      background: linear-gradient(0deg, rgba(245,246,250,0.92) 0%, rgba(245,246,250,0.3) 55%, transparent 100%);
+    }
+    .reno-hero-content {
+      position: relative; z-index: 2; padding: 5rem 4rem;
+      max-width: 1280px; margin: 0 auto; width: 100%;
+    }
+    .hero-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--gold); }
+    .reno-hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5.5vw, 5rem); font-weight: 900;
+      line-height: 1.05; max-width: 700px; margin-bottom: 1.25rem;
+    }
+    .reno-hero-content h1 .gold { color: var(--gold); }
+    .reno-hero-content p {
+      font-size: 1.05rem; color: var(--muted); max-width: 560px;
+      line-height: 1.7; margin-bottom: 2rem;
+    }
+    .hero-cta-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.9rem 2.2rem; background: var(--gold); color: #0b0f1a;
+      border-radius: var(--radius); font-weight: 800; font-size: 0.88rem;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      transition: transform 0.2s, box-shadow 0.2s; border: none; cursor: pointer;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(201,151,58,0.35); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.9rem 2rem; background: transparent; color: var(--text);
+      border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius);
+      font-weight: 600; font-size: 0.88rem; text-transform: uppercase;
+      letter-spacing: 0.06em; transition: border-color 0.2s, color 0.2s; cursor: pointer;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-section {
+      background: var(--bg2);
+      padding: 3rem 2rem;
+    }
+    .progress-inner { max-width: 1280px; margin: 0 auto; }
+    .progress-inner h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .progress-meta {
+      display: flex; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted); margin-bottom: 0.75rem;
+    }
+    .progress-bar-bg {
+      height: 10px; background: var(--border); border-radius: 99px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0; border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+      transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .funding-numbers {
+      display: flex; gap: 3rem; margin-top: 2rem; flex-wrap: wrap;
+    }
+    .funding-num .val {
+      font-family: 'Playfair Display', serif; font-size: 2.2rem;
+      font-weight: 900; color: var(--gold); line-height: 1;
+    }
+    .funding-num .lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-top: 0.25rem; }
+
+    /* ─── SECTION COMMON ─── */
+    .section-inner { max-width: 1280px; margin: 0 auto; padding: 5rem 2rem; }
+    .section-header { margin-bottom: 3rem; }
+    .section-tag { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 900; line-height: 1.1; }
+    .section-line { width: 48px; height: 3px; background: var(--gold); margin-top: 1rem; border-radius: 2px; }
+
+    /* ─── OVERVIEW CARDS ─── */
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+    .overview-card {
+      padding: 2rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .overview-card:hover { transform: translateY(-5px); border-color: var(--gold); }
+    .overview-icon {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 1.25rem;
+    }
+    .overview-card h4 { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
+    .overview-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+    /* ─── COMPARISON SECTION ─── */
+    .comparison-block {
+      margin-bottom: 6rem;
+    }
+    .comparison-block:last-child { margin-bottom: 0; }
+    .comparison-header { margin-bottom: 1.5rem; }
+    .comparison-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 900; margin-bottom: 0.4rem;
+    }
+    .comparison-header p { color: var(--muted); font-size: 0.88rem; }
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
+    }
+    .compare-card { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4/3; }
+    .compare-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+    .compare-card:hover img { transform: scale(1.04); }
+    .compare-label {
+      position: absolute; top: 1rem; left: 1rem;
+      padding: 0.35rem 0.85rem; border-radius: var(--radius-sm);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+    }
+    .label-current { background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .label-proposed { background: var(--gold); color: #0b0f1a; }
+
+    /* ─── SCOPE TABLE ─── */
+    .scope-table { width: 100%; border-collapse: collapse; }
+    .scope-table th, .scope-table td {
+      padding: 1rem 1.25rem; text-align: left;
+      border-bottom: 1px solid var(--border); font-size: 0.85rem;
+    }
+    .scope-table th {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--muted); font-family: 'Space Mono', monospace;
+      font-weight: 400;
+    }
+    .scope-table td:first-child { font-weight: 700; }
+    .scope-table tr:hover td { background: var(--surface); }
+    .badge-status {
+      display: inline-block; padding: 0.25rem 0.65rem;
+      border-radius: 99px; font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .badge-planned { background: rgba(26,86,219,0.15); color: var(--accent); }
+    .badge-ongoing { background: rgba(201,151,58,0.15); color: var(--gold); }
+    .badge-completed { background: rgba(16,185,129,0.15); color: #10b981; }
+
+    /* ─── DONATION TIERS ─── */
+    .tiers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; }
+    .tier-card {
+      padding: 2rem 1.5rem; text-align: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); position: relative; overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .tier-card:hover, .tier-card.featured {
+      transform: translateY(-6px); border-color: var(--gold);
+      box-shadow: 0 20px 48px rgba(201,151,58,0.15);
+    }
+    .tier-card.featured::before {
+      content: 'Most Popular';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      background: var(--gold); color: #0b0f1a;
+      font-size: 0.58rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.12em; padding: 0.3rem 1rem;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    }
+    .tier-amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900; color: var(--gold);
+      margin-bottom: 0.25rem; margin-top: 1.5rem;
+    }
+    .tier-card:not(.featured) .tier-amount { margin-top: 0; }
+    .tier-name { font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+    .tier-benefit { font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+    .tier-btn {
+      width: 100%; padding: 0.7rem; border-radius: var(--radius-sm);
+      border: 1px solid var(--gold); background: transparent;
+      color: var(--gold); font-weight: 700; font-size: 0.78rem;
+      text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tier-btn:hover, .tier-card.featured .tier-btn {
+      background: var(--gold); color: #0b0f1a;
+    }
+
+    /* ─── DONATION FORM ─── */
+    .donate-section { background: var(--bg2); }
+    .donate-wrap {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;
+    }
+    .donate-copy h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.15;
+    }
+    .donate-copy p { color: var(--muted); line-height: 1.75; font-size: 0.92rem; margin-bottom: 1rem; }
+    .donate-trust { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.5rem; }
+    .trust-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; color: var(--muted); }
+    .trust-item svg { color: var(--gold); flex-shrink: 0; }
+    .donate-form { padding: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    .donate-form h3 { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+      background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      font-size: 0.9rem; font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--gold); }
+    .amount-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .amount-chip {
+      padding: 0.45rem 1rem; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: transparent;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer; color: var(--text);
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .amount-chip:hover, .amount-chip.selected { border-color: var(--gold); background: rgba(201,151,58,0.1); color: var(--gold); }
+    .submit-btn {
+      width: 100%; padding: 1rem; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      border: none; color: #fff; font-weight: 800;
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 0.5rem;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201,151,58,0.3); }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-left { opacity: 0; transform: translateX(-32px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal-left.visible { opacity: 1; transform: none; }
+    .reveal-right { opacity: 0; transform: translateX(32px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal-right.visible { opacity: 1; transform: none; }
+    .stagger > * { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .stagger.visible > *:nth-child(1) { opacity:1;transform:none;transition-delay:0.05s; }
+    .stagger.visible > *:nth-child(2) { opacity:1;transform:none;transition-delay:0.12s; }
+    .stagger.visible > *:nth-child(3) { opacity:1;transform:none;transition-delay:0.19s; }
+    .stagger.visible > *:nth-child(4) { opacity:1;transform:none;transition-delay:0.26s; }
+    .stagger.visible > *:nth-child(n+5) { opacity:1;transform:none;transition-delay:0.33s; }
+
+    /* ─── SOCIAL BAR ─── */
+    .social-bar { display: flex; justify-content: center; align-items: center; gap: 2rem; padding: 2.5rem 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; }
+    .social-link { display: flex; align-items: center; gap: 0.6rem; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); transition: color 0.2s; }
+    .social-link svg { width: 18px; height: 18px; fill: currentColor; }
+    .social-link:hover { color: var(--accent); }
+
+    /* ─── FOOTER ─── */
+    footer { border-top: 1px solid var(--border); padding: 2.5rem 2rem; }
+    .footer-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+    .footer-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .footer-brand img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .footer-brand-text { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 900; }
+    .footer-brand-text span { display: block; font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 400; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+    .footer-links a { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy { font-size: 0.68rem; color: var(--muted); }
+
+    @media(max-width:1024px){
+      .donate-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .reno-hero-content { padding: 3rem 2rem; }
+    }
+    @media(max-width:640px){
+      .section-inner { padding: 3.5rem 1.25rem; }
+      .tiers-grid { grid-template-columns: 1fr 1fr; }
+      .overview-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <img src="assets/cetaa-logo.jpg" alt="CETAA Logo" class="nav-logo" />
+    <div class="nav-title">
+      CETAA
+      <span>College of Engineering Trivandrum Alumni Association</span>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="index.html#about">About Us</a></li>
+    <li><a href="index.html#newsroom">Newsroom</a></li>
+    <li><a href="index.html#events">Events</a></li>
+    <li><a href="index.html#gallery">Gallery</a></li>
+    <li><a href="index.html#chapters">Chapters</a></li>
+    <li><a href="renovation.html" class="active">Hall Renovation</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button id="theme-toggle" title="Toggle theme">
+      <svg id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <a href="index.html" class="btn-home">← Home</a>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobile-nav">
+  <a href="index.html">Home</a>
+  <a href="index.html#about">About Us</a>
+  <a href="index.html#newsroom">Newsroom</a>
+  <a href="index.html#events">Events</a>
+  <a href="index.html#gallery">Gallery</a>
+  <a href="renovation.html">Hall Renovation</a>
+</div>
+
+<main>
+
+  <!-- ── HERO ─── -->
+  <div class="reno-hero">
+    <img src="assets/hall-exterior.jpg" alt="Diamond Jubilee Hall" class="reno-hero-img" />
+    <div class="reno-hero-overlay"></div>
+    <div class="reno-hero-content">
+      <p class="hero-eyebrow">Campus Development Initiative 2026</p>
+      <h1>Diamond Jubilee Hall<br><span class="gold">Renovation Project</span></h1>
+      <p>A historic landmark at the College of Engineering Trivandrum — now being transformed into a world-class auditorium and event facility. Help us write the next chapter.</p>
+      <div class="hero-cta-row">
+        <a href="#donate" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Contribute Now
+        </a>
+        <a href="#project" class="btn-outline">
+          Learn More ↓
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FUNDING PROGRESS ─── -->
+  <div class="progress-section" id="progress-bar-section">
+    <div class="progress-inner">
+      <h3>Renovation Funding Progress</h3>
+      <div class="progress-meta">
+        <span>₹38.5 Lakhs raised</span>
+        <span>Goal: ₹75 Lakhs</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" data-target="51"></div>
+      </div>
+      <div class="funding-numbers">
+        <div class="funding-num"><div class="val">₹38.5L</div><div class="lbl">Raised So Far</div></div>
+        <div class="funding-num"><div class="val">₹36.5L</div><div class="lbl">Still Needed</div></div>
+        <div class="funding-num"><div class="val">247</div><div class="lbl">Alumni Contributors</div></div>
+        <div class="funding-num"><div class="val">2026</div><div class="lbl">Target Completion</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROJECT OVERVIEW ─── -->
+  <section id="project">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Project Overview</p>
+        <h2 class="section-title">About the Renovation</h2>
+        <div class="section-line"></div>
+        <p style="color:var(--muted);font-size:0.92rem;margin-top:1rem;max-width:640px;line-height:1.75;">
+          The Diamond Jubilee Hall at the College of Engineering Trivandrum has been the heart of campus events for decades — hosting CETAA Days, convocations, cultural programmes, and distinguished lectures. The proposed renovation will modernise this cherished landmark while honouring its legacy.
+        </p>
+      </div>
+      <div class="overview-grid stagger">
+        <div class="overview-card">
+          <div class="overview-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93 4.93 19.07"/></svg></div>
+          <h4>Central Air Conditioning</h4>
+          <p>Full HVAC system to make the hall comfortable year-round for events, seminars, and gatherings of up to 500 attendees.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div>
+          <h4>Modern Seating</h4>
+          <p>Replacement of existing seating with ergonomic, theatre-style chairs that offer improved visibility and comfort throughout the hall.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m8 21 4-4 4 4M10 17h4"/></svg></div>
+          <h4>AV & Stage Upgrades</h4>
+          <p>Professional audio-visual systems, LED projection, and stage lighting installations for seminars, cultural performances, and alumni events.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <h4>Facade & Surroundings</h4>
+          <p>Exterior painting, landscaping, parking, and facade improvements to present a dignified and welcoming entrance worthy of CET's reputation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BEFORE / AFTER ─── -->
+  <section style="background:var(--bg2);">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Transformation</p>
+        <h2 class="section-title">Current State vs Proposed Vision</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="comparison-block reveal">
+        <div class="comparison-header">
+          <h3>The Diamond Jubilee Hall — Interior</h3>
+          <p>Main auditorium seating, stage, and AV equipment renovation</p>
+        </div>
+        <div class="compare-grid">
+          <div class="compare-card">
+            <img src="assets/hall-current.png" alt="Hall - Current" />
+            <span class="compare-label label-current">Current State</span>
+          </div>
+          <div class="compare-card">
+            <img src="assets/hall-proposed.png" alt="Hall - Proposed" />
+            <span class="compare-label label-proposed">Proposed Vision</span>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </section>
+
+  <!-- ── PROJECT SCOPE TABLE ─── -->
+  <section>
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Project Scope</p>
+        <h2 class="section-title">Work Breakdown</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="reveal" style="overflow-x:auto;">
+        <table class="scope-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Description</th>
+              <th>Estimated Cost</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Central AC System</td>
+              <td>Full HVAC installation for main hall (capacity: 500 seats)</td>
+              <td>₹18 Lakhs</td>
+              <td><span class="badge-status badge-ongoing">In Progress</span></td>
+            </tr>
+            <tr>
+              <td>Hall Seating</td>
+              <td>Theatre-style ergonomic seating replacement</td>
+              <td>₹12 Lakhs</td>
+              <td><span class="badge-status badge-planned">Planned</span></td>
+            </tr>
+            <tr>
+              <td>Stage & AV</td>
+              <td>LED projection, sound system, stage lighting</td>
+              <td>₹14 Lakhs</td>
+              <td><span class="badge-status badge-planned">Planned</span></td>
+            </tr>
+
+            <tr>
+              <td>Facade & Landscaping</td>
+              <td>Exterior paint, landscaping, signage, and parking</td>
+              <td>₹6 Lakhs</td>
+              <td><span class="badge-status badge-planned">Planned</span></td>
+            </tr>
+            <tr>
+              <td>Restroom Upgrades</td>
+              <td>Modernised restrooms with accessible facilities</td>
+              <td>₹4 Lakhs</td>
+              <td><span class="badge-status badge-planned">Planned</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTRIBUTION TIERS ─── -->
+  <section style="background:var(--bg2);">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Give Back</p>
+        <h2 class="section-title">Contribution Tiers</h2>
+        <div class="section-line"></div>
+        <p style="color:var(--muted);font-size:0.9rem;margin-top:1rem;">Every contribution, large or small, helps restore a place that shaped your career and your character.</p>
+      </div>
+      <div class="tiers-grid stagger">
+        <div class="tier-card">
+          <div class="tier-amount">₹1K</div>
+          <div class="tier-name">Supporter</div>
+          <p class="tier-benefit">Name on the Digital Honour Wall; CETAA gratitude certificate</p>
+          <button class="tier-btn" onclick="scrollToDonate('1000')">Contribute</button>
+        </div>
+        <div class="tier-card">
+          <div class="tier-amount">₹5K</div>
+          <div class="tier-name">Contributor</div>
+          <p class="tier-benefit">Name on the Physical Donor Plaque; CETAA Souvenir 2026 mention</p>
+          <button class="tier-btn" onclick="scrollToDonate('5000')">Contribute</button>
+        </div>
+        <div class="tier-card featured">
+          <div class="tier-amount">₹25K</div>
+          <div class="tier-name">Patron</div>
+          <p class="tier-benefit">Seat naming opportunity; Invitation to inauguration; Prominent hall display</p>
+          <button class="tier-btn" onclick="scrollToDonate('25000')">Contribute</button>
+        </div>
+        <div class="tier-card">
+          <div class="tier-amount">₹1L+</div>
+          <div class="tier-name">Benefactor</div>
+          <p class="tier-benefit">Section / Room naming rights; Lifetime recognition at CETAA Hall; All Patron benefits</p>
+          <button class="tier-btn" onclick="scrollToDonate('100000')">Contribute</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DONATE FORM ─── -->
+  <section id="donate" class="donate-section">
+    <div class="section-inner">
+      <div class="donate-wrap">
+        <div class="donate-copy reveal-left">
+          <p class="section-tag" style="margin-bottom:0.75rem;">Your Contribution Matters</p>
+          <h2>Give Back to the Place That Built You</h2>
+          <p>
+            The Diamond Jubilee Hall has witnessed generations of CET alumni — from convocation ceremonies to late-night project presentations, from landmark guest lectures to memorable cultural nights. Now it's time to give back.
+          </p>
+          <p>
+            Your donation goes directly into the renovation fund managed by CETAA. All contributions are acknowledged transparently and donors are recognised in the Hall's permanent record.
+          </p>
+          <p style="color:var(--gold);font-weight:600;font-size:0.88rem;">
+            Bank transfers and UPI payments accepted. Tax receipts issued under applicable provisions.
+          </p>
+          <div class="donate-trust">
+            <div class="trust-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              100% of funds go directly to renovation
+            </div>
+            <div class="trust-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Official receipt provided for every contribution
+            </div>
+            <div class="trust-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Verified and managed by CETAA Executive Committee
+            </div>
+            <div class="trust-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Progress updates shared with all donors quarterly
+            </div>
+          </div>
+        </div>
+
+        <div class="donate-form reveal-right">
+          <h3>Make a Contribution</h3>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" placeholder="Your full name" id="f-name" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="your@email.com" id="f-email" />
+          </div>
+          <div class="form-group">
+            <label>Batch Year</label>
+            <input type="text" placeholder="e.g. 1992" id="f-batch" />
+          </div>
+          <div class="form-group">
+            <label>Contribution Amount (₹)</label>
+            <div class="amount-chips" id="amount-chips">
+              <button class="amount-chip" onclick="selectAmount(this,'1000')">₹1,000</button>
+              <button class="amount-chip" onclick="selectAmount(this,'5000')">₹5,000</button>
+              <button class="amount-chip" onclick="selectAmount(this,'10000')">₹10,000</button>
+              <button class="amount-chip" onclick="selectAmount(this,'25000')">₹25,000</button>
+              <button class="amount-chip" onclick="selectAmount(this,'50000')">₹50,000</button>
+            </div>
+            <input type="number" placeholder="Or enter custom amount" id="f-amount" min="100" />
+          </div>
+          <div class="form-group">
+            <label>Message (Optional)</label>
+            <input type="text" placeholder="A message for the Hall" id="f-msg" />
+          </div>
+          <button class="submit-btn" onclick="handleDonate()">
+            Proceed to Secure Payment →
+          </button>
+          <p style="font-size:0.68rem;color:var(--muted);margin-top:0.75rem;text-align:center;">
+            You'll be directed to a secure payment page. For bank transfer details, contact <a href="mailto:cetaa@cet.ac.in" style="color:var(--gold);">cetaa@cet.ac.in</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SOCIAL ─── -->
+  <div class="social-bar">
+    <a href="https://www.facebook.com/College-of-Engineering-Trivandrum-Alumni-Association-595120010597674" class="social-link" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      Share on Facebook
+    </a>
+    <a href="https://x.com/@CetaaSecretary" class="social-link" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+      Share on X
+    </a>
+    <a href="#" class="social-link" onclick="navigator.clipboard.writeText(location.href);alert('Link copied!')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Copy Link
+    </a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/cetaa-logo.jpg" alt="CETAA" />
+      <div class="footer-brand-text">
+        CETAA
+        <span>College of Engineering Trivandrum Alumni Association</span>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="#">Disclaimer</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="footer-copy">© 2026 CETAA. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+/* ─── ANIMATED BG ─── */
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], mouse = { x: -1000, y: -1000 };
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  for(let i = 0; i < 45; i++) particles.push({ x: Math.random()*1400, y: Math.random()*900, r: Math.random()*1.8+0.5, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, alpha: Math.random()*0.5+0.2 });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,200);
+    g.addColorStop(0,'rgba(201,151,58,0.12)'); g.addColorStop(1,'transparent');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    particles.forEach(p => {
+      const dx=mouse.x-p.x, dy=mouse.y-p.y, dist=Math.sqrt(dx*dx+dy*dy), inf=Math.max(0,1-dist/280);
+      p.x+=p.vx+dx*0.0001; p.y+=p.vy+dy*0.0001;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r+inf*1.5,0,Math.PI*2);
+      ctx.fillStyle=`rgba(26,86,219,${p.alpha+inf*0.4})`; ctx.fill();
+    });
+    for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
+      const a=particles[i],b=particles[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<120){ ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.strokeStyle=`rgba(26,86,219,${0.1*(1-d/120)})`; ctx.lineWidth=0.6; ctx.stroke(); }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─── THEME ─── */
+const toggle = document.getElementById('theme-toggle');
+const iconMoon = document.getElementById('icon-moon');
+const iconSun = document.getElementById('icon-sun');
+let isDark = localStorage.getItem('cetaa-theme') !== 'light';
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  iconMoon.style.display = isDark ? '' : 'none';
+  iconSun.style.display = isDark ? 'none' : '';
+  localStorage.setItem('cetaa-theme', isDark ? 'dark' : 'light');
+}
+applyTheme();
+toggle.addEventListener('click', () => { isDark = !isDark; applyTheme(); });
+
+/* ─── HAMBURGER ─── */
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-nav').classList.toggle('open');
+});
+
+/* ─── SCROLL REVEAL ─── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .stagger').forEach(el => observer.observe(el));
+
+/* ─── PROGRESS BAR ─── */
+const progressObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      const fill = document.getElementById('progress-fill');
+      const target = parseInt(fill.dataset.target);
+      setTimeout(() => { fill.style.width = target + '%'; }, 200);
+      progressObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+progressObserver.observe(document.getElementById('progress-bar-section'));
+
+/* ─── AMOUNT CHIPS ─── */
+function selectAmount(el, amount){
+  document.querySelectorAll('.amount-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('f-amount').value = amount;
+}
+
+/* ─── SCROLL TO DONATE ─── */
+function scrollToDonate(amount){
+  document.getElementById('donate').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => {
+    document.getElementById('f-amount').value = amount;
+    document.querySelectorAll('.amount-chip').forEach(c => {
+      if(c.textContent.replace(/[^0-9]/g,'') === amount) c.classList.add('selected');
+      else c.classList.remove('selected');
+    });
+  }, 600);
+}
+
+/* ─── DONATE ─── */
+function handleDonate(){
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const amount = document.getElementById('f-amount').value.trim();
+  if(!name || !email || !amount){
+    alert('Please fill in your name, email, and contribution amount.');
+    return;
+  }
+  alert(`Thank you, ${name}! Your contribution of ₹${parseInt(amount).toLocaleString('en-IN')} will be processed. Our team will contact you at ${email} with payment details within 24 hours.`);
+}
+
+/* ─── NAVBAR SCROLL ─── */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').style.boxShadow = window.scrollY > 20 ? '0 4px 32px rgba(0,0,0,0.3)' : 'none';
+});
+</script>
+</body>
+</html>

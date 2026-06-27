@@ -1,13 +1,1307 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/cetaalogo.jpg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CETAA</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CETAA — College of Engineering Trivandrum Alumni Association</title>
+  <link rel="icon" type="image/jpg" href="assets/cetaa-logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script>
+    (function(){
+      var t = localStorage.getItem('cetaa-theme');
+      if(t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    /* ─── DESIGN TOKENS ─────────────────────────────── */
+    :root {
+      --bg:        #0b0f1a;
+      --bg2:       #111827;
+      --surface:   rgba(255,255,255,0.04);
+      --border:    rgba(255,255,255,0.08);
+      --text:      #e8eaf0;
+      --muted:     rgba(232,234,240,0.50);
+      --accent:    #1a56db;   /* CET navy-electric */
+      --gold:      #c9973a;   /* institution gold */
+      --glow:      rgba(26,86,219,0.25);
+      --radius:    1.5rem;
+      --radius-sm: 0.75rem;
+      --nav-h:     72px;
+      --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="light"] {
+      --bg:      #f5f6fa;
+      --bg2:     #eaecf4;
+      --surface: rgba(0,0,0,0.04);
+      --border:  rgba(0,0,0,0.08);
+      --text:    #0d1117;
+      --muted:   rgba(13,17,23,0.55);
+      --glow:    rgba(26,86,219,0.10);
+    }
+
+    /* ─── RESET & BASE ──────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ─── ANIMATED BACKGROUND CANVAS ───────────────── */
+    #bg-canvas {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    [data-theme="light"] #bg-canvas { opacity: 0.18; }
+
+    /* ─── NAVBAR ────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      background: rgba(11,15,26,0.82);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    [data-theme="light"] nav {
+      background: rgba(245,246,250,0.88);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .nav-logo {
+      width: 42px; height: 42px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--accent);
+    }
+    .nav-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 900;
+      letter-spacing: 0.03em;
+      line-height: 1.1;
+    }
+    .nav-title span { display: block; font-size: 0.55rem; font-family: 'Space Mono', monospace; letter-spacing: 0.15em; color: var(--muted); font-weight: 400; text-transform: uppercase; }
+    .nav-links {
+      display: flex; align-items: center; gap: 0.2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 0.45rem 0.75rem; border-radius: var(--radius-sm);
+      color: var(--muted); transition: color var(--transition), background var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); }
+    .nav-links a.active { color: var(--accent); }
+    .nav-actions {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .btn-register {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; padding: 0.5rem 1.2rem;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius-sm); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-register:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--glow); }
+    .btn-login {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; padding: 0.5rem 1rem;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .btn-login:hover { border-color: var(--accent); }
+
+    /* Theme toggle */
+    #theme-toggle {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem;
+      transition: background var(--transition);
+    }
+    #theme-toggle:hover { background: var(--glow); }
+    #theme-toggle svg { width: 18px; height: 18px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Mobile hamburger */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--text); border-radius: 2px;
+      transition: transform 0.3s;
+    }
+
+    /* ─── MAIN CONTENT ──────────────────────────────── */
+    main { position: relative; z-index: 1; }
+    .page-wrap { padding-top: var(--nav-h); }
+
+    /* ─── HERO ──────────────────────────────────────── */
+    .hero {
+      min-height: calc(100vh - var(--nav-h));
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 5rem 4rem 4rem;
+      gap: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -20%; right: -10%;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-text { position: relative; z-index: 2; }
+    .hero-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 32px; height: 1px; background: var(--accent);
+    }
+    .hero-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 900; line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+    .hero-headline .accent-line {
+      color: var(--accent);
+      display: block;
+    }
+    .hero-sub {
+      font-size: 1rem; color: var(--muted); line-height: 1.7;
+      max-width: 480px; margin-bottom: 2.5rem;
+    }
+    .hero-cta {
+      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 2rem; background: var(--accent); color: #fff;
+      border-radius: var(--radius); font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer; border: none;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px var(--glow); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 2rem; background: transparent; color: var(--text);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-weight: 600; font-size: 0.85rem; letter-spacing: 0.05em;
+      text-transform: uppercase; transition: border-color 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3rem;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+    }
+    .hero-stat .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900; color: var(--accent);
+      line-height: 1;
+    }
+    .hero-stat .lbl {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--muted); margin-top: 0.25rem;
+    }
+    .hero-visual {
+      position: relative; z-index: 2;
+    }
+    /* ─── SLIDESHOW ─────────────────────────────────── */
+    .hero-img-frame {
+      position: relative; border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+      aspect-ratio: 4/3;
+    }
+    .slideshow {
+      position: relative; width: 100%; height: 100%;
+    }
+    .slide {
+      position: absolute; inset: 0;
+      opacity: 0; transition: opacity 1s ease;
+      pointer-events: none;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 6s ease;
+    }
+    .slide.active img { transform: scale(1.05); }
+    .slide:not(.active) img { transform: scale(1); }
+
+    /* Welcome overlay — first slide only */
+    .slide-welcome {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(11,15,26,0.72) 0%, rgba(26,86,219,0.38) 100%);
+      z-index: 2;
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .slide-welcome.show { opacity: 1; }
+    .slide-welcome.fade-out { opacity: 0; }
+    .slide-welcome-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.9rem, 2vw, 1.25rem);
+      font-weight: 700; color: #fff;
+      text-align: center; padding: 0 1.5rem;
+      line-height: 1.4;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      letter-spacing: 0.02em;
+    }
+    .slide-welcome-line {
+      width: 40px; height: 2px; background: var(--gold);
+      margin: 0.75rem auto 0; border-radius: 2px;
+    }
+
+    /* Dot indicators */
+    .slide-dots {
+      position: absolute; bottom: 1rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 3;
+    }
+    .slide-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transition: background 0.3s, width 0.3s;
+      cursor: pointer; border: none; padding: 0;
+    }
+    .slide-dot.active {
+      background: #fff; width: 18px; border-radius: 3px;
+    }
+
+    /* Prev/next arrows */
+    .slide-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 3; background: rgba(0,0,0,0.35); border: none;
+      color: #fff; width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s; opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .hero-img-frame:hover .slide-arrow { opacity: 1; }
+    .slide-arrow:hover { background: rgba(26,86,219,0.7); }
+    .slide-arrow.prev { left: 0.75rem; }
+    .slide-arrow.next { right: 0.75rem; }
+
+    /* ─── SECTION COMMON ────────────────────────────── */
+    section { position: relative; z-index: 1; }
+    .section-inner { max-width: 1280px; margin: 0 auto; padding: 5rem 2rem; }
+    .section-header { margin-bottom: 3rem; }
+    .section-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 900;
+      line-height: 1.1;
+    }
+    .section-line {
+      width: 48px; height: 3px; background: var(--accent);
+      margin-top: 1rem; border-radius: 2px;
+    }
+
+    /* ─── CARD BASE ─────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.25), 0 0 0 1px var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ─── ABOUT SECTION ─────────────────────────────── */
+    .about-grid {
+      display: grid; grid-template-columns: 1.4fr 1fr;
+      gap: 2rem; align-items: start;
+    }
+    .about-text-card {
+      padding: 2.5rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .about-text-card p {
+      color: var(--muted); line-height: 1.8; font-size: 0.93rem;
+      margin-bottom: 1rem;
+    }
+    .about-text-card p:last-child { margin-bottom: 0; }
+    .about-text-card .read-more {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      color: var(--accent); font-size: 0.8rem; font-weight: 600;
+      margin-top: 1rem;
+    }
+    .about-text-card .read-more:hover { gap: 0.7rem; transition: gap 0.2s; }
+    .msg-cards { display: flex; flex-direction: column; gap: 1rem; }
+    .msg-card {
+      position: relative; overflow: hidden; border-radius: var(--radius);
+      border: 1px solid var(--border);
+      min-height: 160px; cursor: pointer;
+    }
+    .msg-card img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0.35; transition: opacity 0.4s, transform 0.4s;
+    }
+    .msg-card:hover img { opacity: 0.55; transform: scale(1.05); }
+    .msg-card-body {
+      position: relative; z-index: 1; padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(26,86,219,0.55) 0%, transparent 70%);
+      height: 100%; display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .msg-card-body h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700; color: #fff;
+    }
+    .msg-card-body p { font-size: 0.72rem; color: rgba(255,255,255,0.7); margin-top: 0.25rem; }
+
+    /* ─── NEWSROOM ───────────────────────────────────── */
+    .newsroom-wrap { display: grid; grid-template-columns: 1.8fr 1fr; gap: 2rem; }
+    .news-list { display: flex; flex-direction: column; gap: 1.25rem; }
+    .news-item {
+      display: flex; gap: 1.25rem; align-items: flex-start;
+      padding: 1.5rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      transition: border-color 0.3s, transform 0.3s;
+      cursor: pointer;
+    }
+    .news-item:hover { border-color: var(--accent); transform: translateX(4px); }
+    .news-thumb {
+      width: 90px; height: 70px; border-radius: var(--radius-sm);
+      object-fit: cover; flex-shrink: 0;
+    }
+    .news-meta { font-size: 0.65rem; color: var(--accent); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.35rem; }
+    .news-title { font-weight: 700; font-size: 0.9rem; line-height: 1.35; margin-bottom: 0.5rem; }
+    .news-excerpt { font-size: 0.78rem; color: var(--muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .news-read { font-size: 0.7rem; color: var(--accent); font-weight: 600; margin-top: 0.5rem; display: inline-block; }
+
+    /* Sidebar events */
+    .events-card {
+      padding: 2rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      height: 100%;
+    }
+    .events-card h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.2rem;
+      font-weight: 700; margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+    }
+    .event-item { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.5rem; }
+    .event-date {
+      min-width: 50px; text-align: center; padding: 0.6rem 0.4rem;
+      background: var(--accent); border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+    .event-date .day { font-size: 1.4rem; font-weight: 900; color: #fff; line-height: 1; }
+    .event-date .mon { font-size: 0.55rem; text-transform: uppercase; font-family: 'Space Mono', monospace; letter-spacing: 0.1em; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
+    .event-info h4 { font-weight: 700; font-size: 0.82rem; line-height: 1.3; margin-bottom: 0.25rem; }
+    .event-info p { font-size: 0.68rem; color: var(--muted); }
+    .event-past .event-date { background: var(--surface); border: 1px solid var(--border); }
+    .event-past .event-date .day { color: var(--muted); }
+    .event-past .event-date .mon { color: var(--muted); }
+
+    /* ─── DISTINGUISHED ALUMNI ──────────────────────── */
+    .alumni-section { background: var(--bg2); }
+    .alumni-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .alumni-card {
+      padding: 1.5rem 1rem; text-align: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: transform 0.3s, border-color 0.3s;
+      cursor: pointer;
+    }
+    .alumni-card:hover { transform: translateY(-6px); border-color: var(--gold); }
+    .alumni-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 0.75rem;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+    }
+    .alumni-avatar-placeholder {
+      width: 72px; height: 72px; border-radius: 50%;
+      margin: 0 auto 0.75rem;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900; color: #fff;
+    }
+    .alumni-name { font-weight: 700; font-size: 0.8rem; margin-bottom: 0.25rem; }
+    .alumni-batch { font-size: 0.65rem; color: var(--accent); font-family: 'Space Mono', monospace; }
+    .alumni-role { font-size: 0.65rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ─── CHAPTERS ──────────────────────────────────── */
+    .chapters-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.75rem;
+    }
+    .chapter-chip {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 0.72rem; font-weight: 600; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .chapter-chip:hover { border-color: var(--accent); background: var(--glow); }
+    .chapter-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* ─── GALLERY ───────────────────────────────────── */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 200px;
+      gap: 0.75rem;
+    }
+    .gallery-grid .g-item:first-child { grid-column: span 2; }
+    .gallery-grid .g-item:nth-child(4) { grid-row: span 2; }
+    .g-item {
+      border-radius: var(--radius-sm); overflow: hidden;
+      cursor: pointer; position: relative;
+    }
+    .g-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s, filter 0.3s;
+      filter: saturate(0.85);
+    }
+    .g-item:hover img { transform: scale(1.06); filter: saturate(1.1); }
+    .g-item::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .g-item:hover::after { opacity: 1; }
+
+    /* ─── LATEST MEMBERS ────────────────────────────── */
+    .members-scroll {
+      display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 1rem;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .member-chip {
+      flex-shrink: 0; position: relative; overflow: hidden;
+      width: 80px; height: 80px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .member-chip:hover { border-color: var(--gold); transform: translateY(-4px); }
+    .member-chip img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ─── RENOVATION CTA STRIP ──────────────────────── */
+    .reno-strip {
+      background: linear-gradient(135deg, var(--accent) 0%, #0f3298 100%);
+      position: relative; overflow: hidden;
+    }
+    .reno-strip::before {
+      content: 'RENOVATE'; position: absolute; right: -1rem; top: 50%;
+      transform: translateY(-50%); font-family: 'Playfair Display', serif;
+      font-size: 8rem; font-weight: 900; opacity: 0.07; white-space: nowrap;
+      letter-spacing: 0.05em; color: #fff;
+    }
+    .reno-strip-inner {
+      max-width: 1280px; margin: 0 auto; padding: 4rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .reno-strip h2 {
+      font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 900; color: #fff; max-width: 520px; line-height: 1.15;
+    }
+    .reno-strip p { color: rgba(255,255,255,0.75); margin-top: 0.5rem; font-size: 0.9rem; max-width: 500px; }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.9rem 2rem; background: #fff; color: var(--accent);
+      border-radius: var(--radius); font-weight: 800; font-size: 0.85rem;
+      letter-spacing: 0.05em; text-transform: uppercase; flex-shrink: 0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-white:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+
+    /* ─── SOCIAL BAR ────────────────────────────────── */
+    .social-bar {
+      display: flex; justify-content: center; align-items: center; gap: 2rem;
+      padding: 2.5rem 2rem; border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .social-link {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted);
+      transition: color 0.2s;
+    }
+    .social-link svg { width: 18px; height: 18px; fill: currentColor; }
+    .social-link:hover { color: var(--accent); }
+
+    /* ─── FOOTER ────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+    }
+    .footer-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1.5rem;
+    }
+    .footer-brand {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .footer-brand img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .footer-brand-text {
+      font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 900;
+    }
+    .footer-brand-text span { display: block; font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 400; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+    .footer-links {
+      display: flex; flex-wrap: wrap; gap: 1.25rem;
+    }
+    .footer-links a {
+      font-size: 0.72rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.08em; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy { font-size: 0.68rem; color: var(--muted); }
+
+    /* ─── SCROLL ANIMATIONS ─────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(32px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-left { opacity: 0; transform: translateX(-32px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal-left.visible { opacity: 1; transform: none; }
+    .reveal-right { opacity: 0; transform: translateX(32px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal-right.visible { opacity: 1; transform: none; }
+
+    /* stagger children */
+    .stagger > * { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .stagger.visible > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.05s; }
+    .stagger.visible > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.12s; }
+    .stagger.visible > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.19s; }
+    .stagger.visible > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.26s; }
+    .stagger.visible > *:nth-child(5) { opacity: 1; transform: none; transition-delay: 0.33s; }
+    .stagger.visible > *:nth-child(6) { opacity: 1; transform: none; transition-delay: 0.40s; }
+    .stagger.visible > *:nth-child(n+7) { opacity: 1; transform: none; transition-delay: 0.47s; }
+
+    /* ─── LIGHTBOX ──────────────────────────────────── */
+    #lightbox {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 90vw; max-height: 88vh; border-radius: var(--radius);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    }
+    #lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 1.4rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── MOBILE NAV DRAWER ─────────────────────────── */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-actions .btn-login { display: none; }
+    }
+    .mobile-nav {
+      display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 99;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem; flex-direction: column; gap: 0.5rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      padding: 0.65rem 0.75rem; border-radius: var(--radius-sm);
+      font-size: 0.85rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      transition: background 0.2s, color 0.2s;
+    }
+    .mobile-nav a:hover { background: var(--surface); color: var(--text); }
+
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; padding: 4rem 2rem 3rem; gap: 2.5rem; min-height: auto; }
+      .hero-visual { max-width: 600px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .newsroom-wrap { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: repeat(2,1fr); }
+      .gallery-grid .g-item:first-child { grid-column: span 1; }
+    }
+    @media (max-width: 640px) {
+      .section-inner { padding: 3.5rem 1.25rem; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .hero-stats { gap: 1.5rem; }
+      .reno-strip-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Animated Background Canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <img src="assets/cetaa-logo.jpg" alt="CETAA Logo" class="nav-logo" />
+    <div class="nav-title">
+      CETAA
+      <span>College of Engineering Trivandrum Alumni Association</span>
+    </div>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="#about">About Us</a></li>
+    <li><a href="#newsroom">Newsroom</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#chapters">Chapters</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="renovation.html" style="color:var(--gold);font-weight:800;">Hall Renovation</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <button id="theme-toggle" title="Toggle theme">
+      <svg id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <a href="#" class="btn-login">Login</a>
+    <a href="#" class="btn-register">Register</a>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobile-nav">
+  <a href="index.html">Home</a>
+  <a href="#about">About Us</a>
+  <a href="#newsroom">Newsroom</a>
+  <a href="#events">Events</a>
+  <a href="#gallery">Gallery</a>
+  <a href="#chapters">Chapters</a>
+  <a href="#contact">Contact</a>
+  <a href="renovation.html" style="color:var(--gold);">Hall Renovation</a>
+</div>
+
+<!-- MAIN -->
+<main class="page-wrap">
+
+  <!-- ── HERO ─────────────────────────────────────── -->
+  <div class="hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">Est. 1939 · Trivandrum, Kerala</p>
+      <h1 class="hero-headline">
+        Where Engineers<br>
+        <span class="accent-line">Become Legacy.</span>
+      </h1>
+      <p class="hero-sub">
+        The College of Engineering Trivandrum Alumni Association (CETAA) — connecting 85 years of brilliant minds, shared memories, and a community that spans every continent.
+      </p>
+      <div class="hero-cta">
+        <a href="#" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Join the Network
+        </a>
+
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="num">85+</div>
+          <div class="lbl">Years of Legacy</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">20K+</div>
+          <div class="lbl">Alumni Worldwide</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">30+</div>
+          <div class="lbl">Global Chapters</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual reveal-right">
+      <div class="hero-img-frame">
+        <div class="slideshow" id="hero-slideshow">
+
+          <!-- Slide 1: CET gate (first, with welcome overlay) -->
+          <div class="slide active" id="slide-0">
+            <img src="assets/slides/1.png" alt="CET Campus Gate" />
+            <div class="slide-welcome" id="slide-welcome">
+              <div class="slide-welcome-text">Welcome to the Official Alumni<br>Network of College of Engineering Trivandrum</div>
+              <div class="slide-welcome-line"></div>
+            </div>
+          </div>
+
+          <!-- Slides 2–24 -->
+          <div class="slide"><img src="assets/slides/2.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/3.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/4.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/5.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/6.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/7.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/8.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/9.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/10.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/11.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/12.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/13.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/14.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/15.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/16.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/17.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/18.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/19.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/20.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/21.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/22.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/23.png" alt="CET Campus" /></div>
+          <div class="slide"><img src="assets/slides/24.png" alt="CET Campus" /></div>
+
+          <!-- Arrows -->
+          <button class="slide-arrow prev" id="slide-prev" aria-label="Previous">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button class="slide-arrow next" id="slide-next" aria-label="Next">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+
+          <!-- Dot indicators -->
+          <div class="slide-dots" id="slide-dots"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ABOUT ─────────────────────────────────────── -->
+  <section id="about">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Our Story</p>
+        <h2 class="section-title">Welcome to CET Alumni</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="about-grid">
+        <div class="about-text-card reveal-left">
+          <p>
+            The College of Engineering, Trivandrum was established in <strong>1939</strong> as the first Engineering College in the then Travancore State. The first classes were started on 3rd July 1939 during the reign of the Travancore King, Sri Chithira Thirunal Balarama Varma. His vision for technical education planted the seed of what would become one of India's most respected engineering institutions.
+          </p>
+          <p>
+            Initially housed in the former office and bungalow of the Chief Engineer (present PMG Office), CET has grown into a sprawling campus of intellectual excellence. The College of Engineering Trivandrum Alumni Association (CETAA) now proudly connects thousands of alumni across the globe — a living testament to CET's enduring legacy.
+          </p>
+          <p>
+            CETAA facilitates professional networking, mentorship, scholarships, campus development, and cultural events that keep the CET spirit alive in every alumnus, wherever they are in the world.
+          </p>
+          <a href="#" class="read-more">
+            Read Full History
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+        <div class="msg-cards stagger">
+          <a href="#" class="msg-card">
+            <img src="assets/cet-campus.jpg" alt="President" />
+            <div class="msg-card-body">
+              <h4>President's Message</h4>
+              <p>A word from our current President</p>
+            </div>
+          </a>
+          <a href="#" class="msg-card">
+            <img src="assets/hall-exterior.jpg" alt="Secretary" />
+            <div class="msg-card-body">
+              <h4>Secretary's Message</h4>
+              <p>Updates from the CETAA Secretariat</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NEWSROOM ───────────────────────────────────── -->
+  <section id="newsroom" style="background: var(--bg2);">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Latest Updates</p>
+        <h2 class="section-title">Newsroom</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="newsroom-wrap">
+        <div class="news-list stagger">
+          <a href="#" class="news-item">
+            <img src="assets/gallery/g1.png" class="news-thumb" alt="News" />
+            <div>
+              <p class="news-meta">18 Jun 2026</p>
+              <h3 class="news-title">Heartfelt Gratitude to the 1976 Batch (Golden Jubilee Batch)</h3>
+              <p class="news-excerpt">The College of Engineering Trivandrum extends its sincere appreciation to the 1976 Batch for their generous contribution of ₹16 lakhs towards the refurbishment of the CET Indoor Stadium.</p>
+              <span class="news-read">Read More →</span>
+            </div>
+          </a>
+          <a href="#" class="news-item">
+            <img src="assets/gallery/g2.png" class="news-thumb" alt="News" />
+            <div>
+              <p class="news-meta">18 Jun 2026</p>
+              <h3 class="news-title">CETAA Souvenir 2026 — Call for Contributions</h3>
+              <p class="news-excerpt">CETAA Day 2026 is to be celebrated on 25 July 2026. We invite alumni to contribute to the CETAA Souvenir 2026 — a publication that captures memories, achievements, and milestones.</p>
+              <span class="news-read">Read More →</span>
+            </div>
+          </a>
+          <a href="#" class="news-item">
+            <img src="assets/gallery/g3.png" class="news-thumb" alt="News" />
+            <div>
+              <p class="news-meta">9 Jan 2026</p>
+              <h3 class="news-title">GEMS Scholarship 2025–26 — Applications Open</h3>
+              <p class="news-excerpt">CETAA is pleased to announce the GEMS Scholarship 2025–26 for deserving students of CET. Applications are now open via Google Forms. Spread the word to students who need support.</p>
+              <span class="news-read">Read More →</span>
+            </div>
+          </a>
+        </div>
+        <div id="events">
+          <div class="events-card reveal-right">
+            <h3>Upcoming & Past Events</h3>
+            <div class="event-item">
+              <div class="event-date">
+                <div class="day">25</div>
+                <div class="mon">Jul</div>
+              </div>
+              <div class="event-info">
+                <h4>CETAA Day 2026</h4>
+                <p>Diamond Jubilee Hall, CET Trivandrum</p>
+                <p style="color:var(--accent);font-size:0.65rem;margin-top:0.2rem;font-weight:600;">Upcoming</p>
+              </div>
+            </div>
+            <div class="event-item event-past">
+              <div class="event-date">
+                <div class="day">25</div>
+                <div class="mon">May</div>
+              </div>
+              <div class="event-info">
+                <h4>CETAA AGM-2024</h4>
+                <p>3 pm at CETAA Hall</p>
+                <p style="color:var(--muted);font-size:0.65rem;margin-top:0.2rem;">Past Event</p>
+              </div>
+            </div>
+            <div class="event-item event-past">
+              <div class="event-date">
+                <div class="day">22</div>
+                <div class="mon">Jul</div>
+              </div>
+              <div class="event-info">
+                <h4>CETAA Day 2023</h4>
+                <p>Diamond Jubilee Hall, CET</p>
+                <p style="color:var(--muted);font-size:0.65rem;margin-top:0.2rem;">Past Event</p>
+              </div>
+            </div>
+            <a href="#" style="display:block;text-align:center;margin-top:1rem;font-size:0.75rem;color:var(--accent);font-weight:600;">View All Events →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DISTINGUISHED ALUMNI ────────────────────── -->
+  <section id="alumni" class="alumni-section">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Our Pride</p>
+        <h2 class="section-title">Distinguished Alumni</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="alumni-grid stagger">
+        <div class="alumni-card">
+          <div class="alumni-avatar-placeholder">KR</div>
+          <div class="alumni-name">Dr. K. Radhakrishnan</div>
+          <div class="alumni-batch">Batch of 1970</div>
+          <div class="alumni-role">Former Chairman, ISRO</div>
+        </div>
+        <div class="alumni-card">
+          <div class="alumni-avatar-placeholder">VS</div>
+          <div class="alumni-name">V. Sasidharan IAS</div>
+          <div class="alumni-batch">Batch of 1980</div>
+          <div class="alumni-role">Senior Civil Servant</div>
+        </div>
+        <div class="alumni-card">
+          <div class="alumni-avatar-placeholder">PM</div>
+          <div class="alumni-name">Padma Menon</div>
+          <div class="alumni-batch">Batch of 1985</div>
+          <div class="alumni-role">Tech Entrepreneur</div>
+        </div>
+        <div class="alumni-card">
+          <div class="alumni-avatar-placeholder">AK</div>
+          <div class="alumni-name">Arjun Kumar</div>
+          <div class="alumni-batch">Batch of 1992</div>
+          <div class="alumni-role">CEO, Global Tech Firm</div>
+        </div>
+        <div class="alumni-card">
+          <div class="alumni-avatar-placeholder">SN</div>
+          <div class="alumni-name">Sreelatha Nair</div>
+          <div class="alumni-batch">Batch of 1995</div>
+          <div class="alumni-role">Research Scientist, NASA</div>
+        </div>
+        <div class="alumni-card">
+          <div class="alumni-avatar-placeholder">RG</div>
+          <div class="alumni-name">Rajeev Gopinath</div>
+          <div class="alumni-batch">Batch of 2001</div>
+          <div class="alumni-role">Director, DRDO</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem;">
+        <a href="#" class="btn-secondary" style="display:inline-flex;">View All Distinguished Alumni</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHAPTERS ──────────────────────────────────── -->
+  <section id="chapters" style="background:var(--bg2);">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Global Presence</p>
+        <h2 class="section-title">CETAA Chapters Worldwide</h2>
+        <div class="section-line"></div>
+        <p style="color:var(--muted);font-size:0.9rem;margin-top:1rem;max-width:520px;">From Atlanta to Zurich, CETAA chapters keep the alumni community vibrant across every timezone.</p>
+      </div>
+      <div class="chapters-grid stagger">
+        <div class="chapter-chip"><span class="chapter-dot"></span>Atlanta</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Australia</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Bangalore</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>California</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Canada</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Chennai</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Chicago</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Delhi</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Dubai</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Gulf Region</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Hyderabad</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Kerala</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Kuwait</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Mumbai</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>New Jersey</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>New York</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Oman</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Pune</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Qatar</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Singapore</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Texas</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>Thiruvananthapuram</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>UK</div>
+        <div class="chapter-chip"><span class="chapter-dot"></span>UAE</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── GALLERY ───────────────────────────────────── -->
+  <section id="gallery">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Memories</p>
+        <h2 class="section-title">Gallery</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="gallery-grid reveal">
+        <div class="g-item" onclick="openLightbox(this)">
+          <img src="assets/gallery/g1.png" alt="CETAA Event" />
+        </div>
+        <div class="g-item" onclick="openLightbox(this)">
+          <img src="assets/gallery/g2.png" alt="CETAA Event" />
+        </div>
+        <div class="g-item" onclick="openLightbox(this)">
+          <img src="assets/gallery/g3.png" alt="CETAA Event" />
+        </div>
+        <div class="g-item" onclick="openLightbox(this)">
+          <img src="assets/gallery/g4.png" alt="CETAA Event" />
+        </div>
+        <div class="g-item" onclick="openLightbox(this)">
+          <img src="assets/gallery/g5.png" alt="CETAA Event" />
+        </div>
+        <div class="g-item" onclick="openLightbox(this)">
+          <img src="assets/gallery/g6.png" alt="CETAA Event" />
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2rem;">
+        <a href="#" class="btn-secondary" style="display:inline-flex;">View Full Gallery</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LATEST MEMBERS ────────────────────────────── -->
+  <section style="background:var(--bg2);">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <p class="section-tag">Growing Community</p>
+        <h2 class="section-title">Latest Members</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="members-scroll reveal" id="members-row">
+        <!-- filled by JS -->
+      </div>
+      <div style="text-align:center;margin-top:1.5rem;">
+        <a href="#" class="btn-secondary" style="display:inline-flex;">Browse Alumni Directory</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RENOVATION CTA ────────────────────────────── -->
+  <div class="reno-strip">
+    <div class="reno-strip-inner">
+      <div>
+        <h2>Help Us Restore the Diamond Jubilee Hall</h2>
+        <p>A landmark of 85 years of engineering excellence deserves a future as grand as its past. Your contribution makes it possible.</p>
+      </div>
+      <a href="renovation.html" class="btn-white">
+        Support the Renovation
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── SOCIAL ─────────────────────────────────────── -->
+  <div class="social-bar">
+    <a href="https://www.facebook.com/College-of-Engineering-Trivandrum-Alumni-Association-595120010597674" class="social-link" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      Facebook
+    </a>
+    <a href="https://x.com/@CetaaSecretary" class="social-link" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+      Twitter / X
+    </a>
+    <a href="https://www.linkedin.com/school/college-of-engineering-trivandrum/" class="social-link" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      LinkedIn
+    </a>
+    <a href="https://youtube.com/@cetaacet" class="social-link" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+      YouTube
+    </a>
+    <a href="https://cet.ac.in" class="social-link" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      CET Website
+    </a>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ───────────────────────────────────────── -->
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/cetaa-logo.jpg" alt="CETAA" />
+      <div class="footer-brand-text">
+        CETAA
+        <span>College of Engineering Trivandrum Alumni Association</span>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="#">Disclaimer</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Alumni Directory</a>
+      <a href="renovation.html">Hall Renovation</a>
+    </div>
+    <div class="footer-copy">© 2026 CETAA. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<script>
+/* ─── ANIMATED BACKGROUND ───────────────────────── */
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], mouse = { x: -1000, y: -1000 };
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX; mouse.y = e.clientY;
+  });
+
+  const COUNT = 55;
+  for(let i = 0; i < COUNT; i++){
+    particles.push({
+      x: Math.random() * 1400,
+      y: Math.random() * 900,
+      r: Math.random() * 1.8 + 0.5,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.5 + 0.2
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+
+    const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 220);
+    grad.addColorStop(0, 'rgba(26,86,219,0.18)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    particles.forEach(p => {
+      const dx = mouse.x - p.x, dy = mouse.y - p.y;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      const influence = Math.max(0, 1 - dist / 300);
+      p.x += p.vx + dx * 0.00015;
+      p.y += p.vy + dy * 0.00015;
+      if(p.x < 0) p.x = W; if(p.x > W) p.x = 0;
+      if(p.y < 0) p.y = H; if(p.y > H) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r + influence * 1.5, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(26,86,219,${p.alpha + influence * 0.4})`;
+      ctx.fill();
+    });
+
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i+1; j < particles.length; j++){
+        const a = particles[i], b = particles[j];
+        const dist = Math.hypot(a.x-b.x, a.y-b.y);
+        if(dist < 130){
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(26,86,219,${0.12*(1-dist/130)})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─── THEME TOGGLE ──────────────────────────────── */
+const toggle = document.getElementById('theme-toggle');
+const iconMoon = document.getElementById('icon-moon');
+const iconSun = document.getElementById('icon-sun');
+let isDark = localStorage.getItem('cetaa-theme') !== 'light';
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  iconMoon.style.display = isDark ? '' : 'none';
+  iconSun.style.display = isDark ? 'none' : '';
+  localStorage.setItem('cetaa-theme', isDark ? 'dark' : 'light');
+}
+applyTheme();
+toggle.addEventListener('click', () => { isDark = !isDark; applyTheme(); });
+
+/* ─── HAMBURGER ─────────────────────────────────── */
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-nav').classList.toggle('open');
+});
+
+/* ─── SCROLL REVEAL ─────────────────────────────── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .stagger').forEach(el => observer.observe(el));
+
+/* ─── MEMBERS ROW ───────────────────────────────── */
+const memberCount = 19;
+const row = document.getElementById('members-row');
+for(let i = 1; i <= memberCount; i++){
+  const chip = document.createElement('div');
+  chip.className = 'member-chip';
+  chip.innerHTML = `<img src="assets/members/m${i}.png" alt="Member ${i}" loading="lazy" />`;
+  row.appendChild(chip);
+}
+
+/* ─── LIGHTBOX ──────────────────────────────────── */
+function openLightbox(el){
+  const src = el.querySelector('img').src;
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+}
+document.getElementById('lightbox').addEventListener('click', e => {
+  if(e.target === document.getElementById('lightbox')) closeLightbox();
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+
+/* ─── HERO SLIDESHOW ────────────────────────────── */
+(function(){
+  const slides = document.querySelectorAll('#hero-slideshow .slide');
+  const dotsContainer = document.getElementById('slide-dots');
+  const welcome = document.getElementById('slide-welcome');
+  const total = slides.length;
+  let current = 0;
+  let timer;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'slide-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(d);
+  });
+  const dots = dotsContainer.querySelectorAll('.slide-dot');
+
+  function goTo(n){
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    resetTimer();
+  }
+
+  function next(){ goTo(current + 1); }
+  function resetTimer(){ clearInterval(timer); timer = setInterval(next, 4500); }
+
+  document.getElementById('slide-next').addEventListener('click', () => { goTo(current + 1); });
+  document.getElementById('slide-prev').addEventListener('click', () => { goTo(current - 1); });
+
+  if(welcome){
+    setTimeout(() => welcome.classList.add('show'), 300);
+    setTimeout(() => welcome.classList.add('fade-out'), 4300);
+    setTimeout(() => welcome.remove(), 5200);
+  }
+
+  resetTimer();
+})();
+
+
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  nav.style.boxShadow = window.scrollY > 20 ? '0 4px 32px rgba(0,0,0,0.3)' : 'none';
+});
+</script>
+</body>
 </html>
